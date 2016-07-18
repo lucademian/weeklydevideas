@@ -53,7 +53,7 @@ $.ajax({
     passKey:passKey
   },
   success: function(response){
-    console.log(response);
+    //console.log(response);
     if(response.success)
     {
       items = response.payload.items;
@@ -83,7 +83,7 @@ $("body").on("click", ".upvote", function(){
         passKey:passKey
       },
       success: function(response){
-        console.log(response);
+        //console.log(response);
       }
     });
   }
@@ -97,7 +97,7 @@ $("body").on("click", ".upvote", function(){
         passKey:passKey
       },
       success: function(response){
-        console.log(response);
+        //console.log(response);
       }
     });
     element.find(".vote-count").text(voteCount + 2);
@@ -113,7 +113,7 @@ $("body").on("click", ".upvote", function(){
         passKey:passKey
       },
       success: function(response){
-        console.log(response);
+        //console.log(response);
       }
     });
     element.find(".vote-count").text(voteCount + 1);
@@ -139,7 +139,7 @@ $("body").on("click", ".downvote", function(){
         passKey:passKey
       },
       success: function(response){
-        console.log(response);
+        //console.log(response);
       }
     });
   }
@@ -153,7 +153,7 @@ $("body").on("click", ".downvote", function(){
         passKey:passKey
       },
       success: function(response){
-        console.log(response);
+        //console.log(response);
       }
     });
     element.find(".vote-count").text(voteCount - 2);
@@ -169,7 +169,7 @@ $("body").on("click", ".downvote", function(){
         passKey:passKey
       },
       success: function(response){
-        console.log(response);
+        //console.log(response);
       }
     });
     element.find(".vote-count").text(voteCount - 1);
