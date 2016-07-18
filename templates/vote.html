@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Weekly Dev Idea Voting</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/vote.css') }}">
+  </head>
+
+  <body>
+    <section id="top">
+      <!-- <nav>
+        <a href="#">Challenges</a>
+        <a href="#">Projects</a>
+        <a href="#">Past Projects</a>
+      </nav> -->
+      <h1 id="title">Weekly Dev</h1>
+      <h2>Ideas</h2>
+      <img id="scroll-down" src="http://lucademian.com/down-arrow.png" alt="scroll down">
+      <div id="logos">
+        <a href="#"><img src="{{ url_for('static',filename='images/Github-Mark-Light-64px.png') }}" alt="Github"></a>
+      </div>
+    </section>
+    <section id="bottom">
+      <form id="newidea">
+        <h1>New Idea:</h1>
+        <input type="text" placeholder="Title..."><br>
+        <textarea placeholder="Description..."></textarea><br>
+        <button type="submit">Submit</button>
+      </form>
+      <div id="list">
+        <select id="sortby">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="top">Top</option>
+        </select>
+        <ul></ul>
+      </div>
+    </section>
+
+    <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+    <script>
+      weekNum = {{ week }}
+    </script>
+    <script src="{{ url_for('static',filename='scripts/vote.js') }}"></script>
+  </body>
+</html>
