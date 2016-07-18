@@ -40,6 +40,9 @@ function listItems(items){
       </div>\
     </li>');
   });
+
+  if(items.length == 0)
+    $("#list ul").html('<div id="notfound">No Ideas Found!</div>');
 }
 
 $.ajax({

@@ -328,6 +328,20 @@ h2{
 	transform:rotate(180deg);
 	width:60px;
 }
+#weeknum{
+	font:28px Montserrat, sans-serif;
+	position: absolute;
+	top:0;
+	left:0;
+	padding:15px;
+	color:#FFF;
+}
+#notfound{
+	font:40px Roboto, sans-serif;
+	color:#000;
+	margin-top:50px;
+	margin-bottom:100px;
+}
 
 @media screen and (max-width:550px){
   #title{
@@ -343,4 +357,14 @@ h2{
   #title::before{
     content:"";
   }
+}
+
+@media screen and (max-width:280px){
+	#logos{
+		display: none;
+	}
+	#weeknum{
+		width:100%;
+		text-align:center;
+	}
 }
