@@ -5,7 +5,7 @@ A website where users can vote on ideas for the weeklydev.io projects
 
  - Install python 2.7
  - install pip
- - install mysql
+ - install mysql (ideally 5.6. If that is not possible, let me know and I can change the code a bit)
  - `pip install flask`
  - `pip install flask-mysql`
  - This should work, let me know if there are any issues
