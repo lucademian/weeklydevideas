@@ -1,25 +1,12 @@
 # Weeklydev.io ideas
 A website where users can vote on ideas for the weeklydev.io projects
 
-### Installation:
-
- - Install python 2.7
- - install pip
- - install mysql (ideally 5.6. If that is not possible, let me know and I can change the code a bit)
- - `pip install flask`
- - `pip install flask-mysql`
- - This should work, let me know if there are any issues
-
 
 ### Live Version [HERE][link]
-*Not live because I don't have a server. If anyone wants to donate server space, I would really appreciate it.*
-<!--
-&nbsp;
-Help me out with server costs:
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=6JKAEFS3WTTRA&lc=US&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted) -->
+
 ***
 
 ## Screenshot
-[![Website Screenshot](screenshot-new.png)][link]
+[![Website Screenshot](screenshot.png)][link]
 
-[link]: http://weeklydev.io
+[link]: http://ideas.weeklydev.io
