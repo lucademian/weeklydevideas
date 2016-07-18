@@ -32,15 +32,71 @@ def verify_user(userId, passKey):
 
     return {"success":success, "userNumId":userNumId}
 
+def get_ideas_incomplete(weekNum):
 
+    items = []
+    error = ""
+    success = False
+    payload = {}
+    userId = request.args.get("userId")
+    passKey = request.args.get("passKey")
+
+    cursor.execute("SELECT id, title, text, longid, unix_timestamp(date), week FROM `ideas` WHERE week=%s ORDER BY date DESC", (weekNum,))
+    rawItems = cursor.fetchall()
+
+    verifyuser = verify_user(userId, passKey)
+    userNumId = verifyuser["userNumId"]
+
+    if verifyuser["success"]:
+        for item in rawItems:
+            cursor.execute("SELECT * FROM `upvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId,item[0]))
+
+            vote = "neutral"
+
+            if cursor.rowcount > 0:
+                vote = "upvoted"
+            else:
+                cursor.execute("SELECT * FROM `downvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId,item[0]))
+                if cursor.rowcount > 0:
+                    vote = "downvoted"
+
+            cursor.execute("SELECT itemid FROM `upvotes` WHERE `itemid`=%s", (item[0],))
+            upvotes = cursor.rowcount
+
+            cursor.execute("SELECT itemid FROM `downvotes` WHERE `itemid`=%s", (item[0],))
+            downvotes = cursor.rowcount
+
+            karma = upvotes - downvotes
+
+            items.append({"id":item[3], "title":item[1], "text":item[2], "date":item[4], "vote":vote, "karma":karma})
+
+        success = True
+        error = ""
+        payload = {"items":items}
+    else:
+        success = False
+        error = "Unable to verify user"
+
+    return {"success":success, "error":error, "payload":payload}
+
+
+
+@app.route("/week/<weekNum>/")
 @app.route("/")
-def vote_page():
-    return render_template("vote.html", week=currentWeek)
+def vote_page(weekNum=currentWeek):
+    cursor.execute("SELECT * FROM ideas WHERE week=%s", (weekNum,))
+    rawItems = cursor.fetchall()
+    items = []
+    for item in rawItems:
+        cursor.execute("SELECT itemid FROM `upvotes` WHERE `itemid`=%s", (item[0],))
+        upvotes = cursor.rowcount
+        cursor.execute("SELECT itemid FROM `downvotes` WHERE `itemid`=%s", (item[0],))
+        downvotes = cursor.rowcount
+        karma = upvotes - downvotes
+        items.append({"id":item[3], "title":item[1], "text":item[2], "date":item[4], "karma":karma})
 
+    return render_template("vote.html", week=weekNum, items=items)
 
-@app.route("/week/<weekNum>")
-def week_page(weekNum):
-    return render_template("vote.html", week=weekNum)
 
 @app.route("/api/ideas/current/", methods = ["GET"])
 @app.route("/api/ideas/week/<weekNum>/", methods = ["GET"])

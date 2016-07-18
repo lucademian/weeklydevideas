@@ -33,7 +33,19 @@
           <option value="oldest">Oldest</option>
           <option value="top">Top</option>
         </select>
-        <ul></ul>
+        <ul>
+          {% for item in items %}
+          <li class="vote-item neutral" data-id="{{ item['id'] }}">
+            <div class="vote-title">{{ item['title'] }}</div>
+            <div class="vote-text">{{ item['text'] }}</div>
+            <div class="vote-actions">
+              <div class="vote-action upvote"></div>
+              <div class="vote-count">{{ item['karma'] }}</div>
+              <div class="vote-action downvote"></div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
       </div>
     </section>
 
