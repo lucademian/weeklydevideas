@@ -239,3 +239,16 @@ $("#newidea").submit(function(e){
     }
   });
 });
+
+
+$(document).scroll(function(){
+  if($(document).scrollTop() > 800)
+    $("#scrollup").addClass("active");
+  else {
+    $("#scrollup").removeClass("active");
+  }
+});
+$("#scrollup").click(function(e){
+  e.preventDefault();
+  $("body").animate({scrollTop:0});
+});
