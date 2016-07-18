@@ -1,6 +1,15 @@
 # Weeklydev.io ideas
 A website where users can vote on ideas for the weeklydev.io projects
 
+### Installation:
+
+ - Install python 2.7
+ - install pip
+ - install mysql
+ - `pip install flask`
+ - `pip install flask-mysql`
+ - This should work, let me know if there are any issues
+
 
 ### Live Version [HERE][link]
 *Not live because I don't have a server. If anyone wants to donate server space, I would really appreciate it.*
