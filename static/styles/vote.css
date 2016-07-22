@@ -190,6 +190,7 @@ h2{
   border-radius: 2px;
   max-width: 400px;
   vertical-align: top;
+	word-break: break-all;
 }
 .vote-actions{
 	position:absolute;
@@ -228,6 +229,7 @@ h2{
 .vote-text{
 	padding-top:7px;
 	font:17px Roboto, sans-serif;
+	word-break: break-all;
 }
 .vote-count{
 	display:block;

@@ -2,6 +2,13 @@ from flask import Flask, render_template, redirect, jsonify, request
 from flaskext.mysql import MySQL
 import random
 
+
+from jinja2 import utils
+
+def strip_tags(html):
+    return str(utils.escape(html))
+
+
 mysql = MySQL()
 app = Flask(__name__)
 
@@ -50,6 +57,23 @@ def vote_page(weekNum=currentWeek):
     return render_template("vote.html", week=weekNum, items=items, numItems=len(items))
 
 
+@app.route("/all/")
+def all_items():
+    cursor.execute("SELECT * FROM ideas")
+    rawItems = cursor.fetchall()
+    items = []
+    for item in rawItems:
+        cursor.execute("SELECT itemid FROM `upvotes` WHERE `itemid`=%s", (item[0],))
+        upvotes = cursor.rowcount
+        cursor.execute("SELECT itemid FROM `downvotes` WHERE `itemid`=%s", (item[0],))
+        downvotes = cursor.rowcount
+        karma = upvotes - downvotes
+        items.append({"id":item[3], "title":item[1], "text":item[2], "date":item[4], "karma":karma})
+
+    return render_template("vote.html", week=0, items=items, numItems=len(items))
+
+
+
 @app.route("/api/ideas/current/", methods = ["GET"])
 @app.route("/api/ideas/week/<weekNum>/", methods = ["GET"])
 def get_ideas(weekNum=currentWeek):
@@ -59,7 +83,12 @@ def get_ideas(weekNum=currentWeek):
     userId = request.args.get("userId")
     passKey = request.args.get("passKey")
 
-    cursor.execute("SELECT id, title, text, longid, unix_timestamp(date), week FROM `ideas` WHERE week=%s ORDER BY date DESC", (weekNum,))
+    if weekNum != 0:
+        cursor.execute("SELECT id, title, text, longid, unix_timestamp(date), week FROM `ideas` WHERE week=%s ORDER BY date DESC", (weekNum,))
+    else:
+        cursor.execute("SELECT id, title, text, longid, unix_timestamp(date), week FROM `ideas` ORDER BY date DESC")
+
+
     rawItems = cursor.fetchall()
 
     verifyuser = verify_user(userId, passKey)
@@ -210,8 +239,8 @@ def create_idea():
     userId = request.form["userId"]
     passKey = request.form["passKey"]
 
-    title = request.form["title"]
-    text = request.form["text"]
+    title = strip_tags(request.form["title"])
+    text = strip_tags(request.form["text"])
 
     longId = generateString(20)
     cursor.execute("SELECT `longid` FROM `ideas` WHERE `longid`=%s", (longId,))

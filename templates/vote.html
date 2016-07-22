@@ -20,7 +20,11 @@
         <a href="https://github.com/lucadem1313/weeklydevideas" target="_blank"><img src="{{ url_for('static',filename='images/GitHub-Mark-Light-64px.png') }}" alt="Github"></a>
         <a href="http://lucademian.com" target="_blank" title="Created By /u/lucadem1313"><img src="{{ url_for('static',filename='images/lucalogo.png') }}" alt="Luca"></a>
       </div>
+      {% if week != 0 %}
       <div id="weeknum">Week {{ week }}</div>
+      {% else %}
+      <div id="weeknum">All Time</div>
+      {% endif %}
     </section>
     <section id="bottom">
       <form id="newidea">
