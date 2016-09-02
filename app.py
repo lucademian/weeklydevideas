@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, jsonify, request
-from flaskext.mysql import MySQL
+from flask_mysqldb import MySQL
 import random
-
 
 from jinja2 import utils
 
@@ -9,26 +8,22 @@ def strip_tags(html):
     return str(utils.escape(html))
 
 
-mysql = MySQL()
 app = Flask(__name__)
 
-# Set up MySQL Connection Variables
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = ''
-app.config['MYSQL_DATABASE_DB'] = 'ideas'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'ideas'
+app.config['MYSQL__HOST'] = 'localhost'
 
-# define connection variables
-db = mysql.connect()
-cursor = db.cursor()
+mysql = MySQL(app)
+
 
 currentWeek = 1
 
 def generateString(length):
     return ''.join(random.choice('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz') for i in range(length))
 
-def verify_user(userId, passKey):
+def verify_user(cursor, userId, passKey):
     cursor.execute("SELECT * FROM `users` WHERE `longid`=%s AND `passkey`=%s", (userId, passKey))
     if cursor.rowcount > 0:
         success = True
@@ -43,6 +38,9 @@ def verify_user(userId, passKey):
 @app.route("/week/<weekNum>/")
 @app.route("/")
 def vote_page(weekNum=currentWeek):
+    conn = mysql.connection
+    cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM ideas WHERE week=%s", (weekNum,))
     rawItems = cursor.fetchall()
     items = []
@@ -59,6 +57,9 @@ def vote_page(weekNum=currentWeek):
 
 @app.route("/all/")
 def all_items():
+    conn = mysql.connection
+    cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM ideas")
     rawItems = cursor.fetchall()
     items = []
@@ -78,8 +79,10 @@ def all_items():
 @app.route("/api/ideas/week/<weekNum>/", methods = ["GET"])
 def get_ideas(weekNum=currentWeek):
 
-    items = []
+    conn = mysql.connection
+    cursor = conn.cursor()
 
+    items = []
     userId = request.args.get("userId")
     passKey = request.args.get("passKey")
 
@@ -91,7 +94,7 @@ def get_ideas(weekNum=currentWeek):
 
     rawItems = cursor.fetchall()
 
-    verifyuser = verify_user(userId, passKey)
+    verifyuser = verify_user(cursor, userId, passKey)
     userNumId = verifyuser["userNumId"]
 
     if verifyuser["success"]:
@@ -124,6 +127,9 @@ def get_ideas(weekNum=currentWeek):
 
 @app.route("/api/user/", methods = ["POST"])
 def create_user():
+    conn = mysql.connection
+    cursor = conn.cursor()
+
     success = False
     error = ""
     payload = {}
@@ -139,7 +145,7 @@ def create_user():
 
     passKey = generateString(15)
     cursor.execute("INSERT INTO `users` (`longid`, `passkey`) VALUES (%s, %s)", (userLongId,passKey))
-    db.commit()
+    conn.commit()
 
     success = True
     error = ""
@@ -154,7 +160,7 @@ def unvote(itemId):
     userId = request.form["userId"]
     passKey = request.form["passKey"]
 
-    verifyuser = verify_user(userId, passKey)
+    verifyuser = verify_user(cursor, userId, passKey)
 
     if verifyuser["success"]:
         success = True
@@ -166,7 +172,7 @@ def unvote(itemId):
 
         cursor.execute("DELETE FROM `upvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId, itemNumId))
         cursor.execute("DELETE FROM `downvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId, itemNumId))
-        db.commit()
+        conn.commit()
     else:
         success = False
         error = "Unable to verify user."
@@ -177,10 +183,13 @@ def unvote(itemId):
 
 @app.route("/api/<itemId>/upvote/", methods = ["POST"])
 def upvote(itemId):
+    conn = mysql.connection
+    cursor = conn.cursor()
+
     userId = request.form["userId"]
     passKey = request.form["passKey"]
 
-    verifyuser = verify_user(userId, passKey)
+    verifyuser = verify_user(cursor, userId, passKey)
 
     if verifyuser["success"]:
         success = True
@@ -193,7 +202,7 @@ def upvote(itemId):
         cursor.execute("DELETE FROM `upvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId, itemNumId))
         cursor.execute("DELETE FROM `downvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId, itemNumId))
         cursor.execute("INSERT INTO `upvotes` (`userid`, `itemid`) VALUES (%s, %s)", (userNumId, itemNumId))
-        db.commit()
+        conn.commit()
     else:
         success = False
         error = "Unable to verify user."
@@ -204,10 +213,13 @@ def upvote(itemId):
 
 @app.route("/api/<itemId>/downvote/", methods = ["POST"])
 def downvote(itemId):
+    conn = mysql.connection
+    cursor = conn.cursor()
+
     userId = request.form["userId"]
     passKey = request.form["passKey"]
 
-    verifyuser = verify_user(userId, passKey)
+    verifyuser = verify_user(cursor, userId, passKey)
 
     if verifyuser["success"]:
         success = True
@@ -220,7 +232,7 @@ def downvote(itemId):
         cursor.execute("DELETE FROM `upvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId, itemNumId))
         cursor.execute("DELETE FROM `downvotes` WHERE `userid`=%s AND `itemid`=%s", (userNumId, itemNumId))
         cursor.execute("INSERT INTO `downvotes` (`userid`, `itemid`) VALUES (%s, %s)", (userNumId, itemNumId))
-        db.commit()
+        conn.commit()
     else:
         success = False
         error = "Unable to verify user."
@@ -232,6 +244,9 @@ def downvote(itemId):
 
 @app.route("/api/idea/", methods = ["POST"])
 def create_idea():
+    conn = mysql.connection
+    cursor = conn.cursor()
+
     success = False
     error = ""
     payload = {}
@@ -252,7 +267,7 @@ def create_idea():
         numRows = cursor.rowcount
 
 
-    verifyuser = verify_user(userId, passKey)
+    verifyuser = verify_user(cursor, userId, passKey)
 
     if verifyuser["success"]:
         success = True
@@ -262,7 +277,7 @@ def create_idea():
             cursor.execute("INSERT INTO `ideas` (`title`, `text`, `longid`, `week`) VALUES (%s, %s, %s, %s)", (title, text, longId, currentWeek))
             insertedId = cursor.lastrowid
             cursor.execute("INSERT INTO `upvotes` (`userid`, `itemid`) VALUES (%s, %s)", (userNumId, insertedId))
-            db.commit()
+            conn.commit()
         else:
             success = False
             error = "Invalid Submission"
